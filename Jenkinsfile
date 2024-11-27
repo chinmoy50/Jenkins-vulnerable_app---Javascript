@@ -69,13 +69,17 @@ pipeline {
         }
 
         stage('Check SCA Result') {
-            when {
-                expression { return env.CAN_PROCEED_SCA != 'true' }
-            }
-            steps {
-                error "SCA scan failed. Deployment cancelled."
-            }
-        }
+	       when {
+		       expression { return env.CAN_PROCEED_SCA != 'true' }
+	       }
+	       steps {
+		       script {
+		           catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+		                error "SCA scan failed. Deployment cancelled."
+		           }
+		       }
+	       }
+	    }
 
         stage('Perform SAST Scan') {
             steps {
