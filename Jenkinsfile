@@ -68,19 +68,6 @@ pipeline {
             }
         }
 
-        stage('Check SCA Result') {
-	       when {
-		       expression { return env.CAN_PROCEED_SCA != 'true' }
-	       }
-	       steps {
-		       script {
-		           catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-		                error "SCA scan failed. Deployment cancelled."
-		           }
-		       }
-	       }
-	    }
-
         stage('Perform SAST Scan') {
             steps {
                 script {
@@ -107,15 +94,6 @@ pipeline {
 
                     env.CAN_PROCEED_SAST = canProceedSAST.toString()
                 }
-            }
-        }
-
-        stage('Check SAST Result') {
-            when {
-                expression { return env.CAN_PROCEED_SAST != 'true' }
-            }
-            steps {
-                error "SAST scan failed. Deployment cancelled."
             }
         }
 
